@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="PRIMAL3: Pathfinding via Reinforcement and Imitation Multi-Agent Learning — Leveraging LaCAM3"
+    />
+    <title>PRIMAL3 — Multi-Agent Pathfinding</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="carousel.js" defer></script>
+    <script src="video-gallery.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <section class="hero" aria-labelledby="paper-title">
+        <video
+          class="hero__video"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          aria-hidden="true"
+        >
+          <source src="1000_zoom.mp4" type="video/mp4" />
+        </video>
+        <div class="hero__scrim" aria-hidden="true"></div>
+
+        <div class="hero__content">
+          <div class="logos" aria-label="Participating institutions and laboratories">
+            <div class="logos__row logos__row--institutions">
+              <div class="logo-frame logo-frame--nus">
+                <img
+                  class="logo logo--nus"
+                  src="nus_logo.png"
+                  alt="National University of Singapore"
+                />
+              </div>
+              <span class="logos__divider" aria-hidden="true"></span>
+              <div class="logo-frame logo-frame--stanford">
+                <img
+                  class="logo logo--stanford"
+                  src="stanford_logo.png"
+                  alt="Stanford University"
+                />
+              </div>
+            </div>
+
+            <div class="logos__row logos__row--labs">
+              <div class="logo-tile logo-tile--marmot">
+                <img
+                  class="logo logo--marmot"
+                  src="marmot_logo.png"
+                  alt="Multi-Agent Robotic Motion Lab (MARMot)"
+                />
+              </div>
+              <div class="logo-tile logo-tile--msl">
+                <img
+                  class="logo logo--msl"
+                  src="msl_logo.png"
+                  alt="Multi-robot Systems Lab (MSL)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <header class="paper-heading">
+            <p class="paper-heading__eyebrow">Multi-Agent Pathfinding</p>
+            <h1 id="paper-title">
+              <span class="paper-heading__accent">PRIMAL3:</span>
+              <span>Pathfinding via Reinforcement and Imitation Multi-Agent Learning</span>
+              <span class="paper-heading__subtitle">Leveraging LaCAM3</span>
+            </h1>
+          </header>
+
+          <div class="authors" aria-label="Paper authors and affiliations">
+            <p class="authors__names">
+              <span>Chengyang He<sup>1</sup></span><span>Tanishq Duhan<sup>1</sup></span><span>Gadiel Sznaier Camps<sup>2</sup></span><span>Fangyuan Wang<sup>1</sup></span><span>Yuhong Cao<sup>1</sup></span><span>Jiankai Sun<sup>2</sup></span><span>Ge Sun<sup>1</sup></span><span>Mac Schwager<sup>2</sup></span><span>Guillaume Sartoretti<sup>1,†</sup></span>
+            </p>
+
+            <div class="authors__affiliations">
+              <p>
+                <sup>1</sup> Multi-Agent Robotic Motion Lab (MARMot), National University of Singapore
+              </p>
+              <p>
+                <sup>2</sup> Multi-robot Systems Lab (MSL), Stanford University
+              </p>
+              <p class="authors__note"><sup>†</sup> Corresponding author</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__edge" aria-hidden="true"></div>
+      </section>
+
+      <section id="overview" class="overview" aria-labelledby="overview-title">
+        <div class="overview__inner">
+          <div class="banner-carousel" data-carousel aria-label="PRIMAL3 environments">
+            <div class="banner-carousel__track">
+              <figure class="banner-carousel__slide is-active" data-slide aria-hidden="false">
+                <img
+                  src="banners/palo.png"
+                  alt="PRIMAL3 multi-agent pathfinding in Palo Alto"
+                  loading="eager"
+                  decoding="async"
+                />
+                <figcaption>Palo Alto</figcaption>
+              </figure>
+              <figure class="banner-carousel__slide" data-slide aria-hidden="true">
+                <img
+                  src="banners/sf.png"
+                  alt="PRIMAL3 multi-agent pathfinding in San Francisco"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>San Francisco</figcaption>
+              </figure>
+              <figure class="banner-carousel__slide" data-slide aria-hidden="true">
+                <img
+                  src="banners/sg.png"
+                  alt="PRIMAL3 multi-agent pathfinding in Singapore"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>Singapore</figcaption>
+              </figure>
+            </div>
+
+            <div class="banner-carousel__controls" aria-label="Choose banner">
+              <button
+                class="banner-carousel__dot is-active"
+                type="button"
+                data-carousel-dot="0"
+                aria-label="Show Palo Alto banner"
+                aria-current="true"
+              ></button>
+              <button
+                class="banner-carousel__dot"
+                type="button"
+                data-carousel-dot="1"
+                aria-label="Show San Francisco banner"
+                aria-current="false"
+              ></button>
+              <button
+                class="banner-carousel__dot"
+                type="button"
+                data-carousel-dot="2"
+                aria-label="Show Singapore banner"
+                aria-current="false"
+              ></button>
+            </div>
+          </div>
+
+          <div class="overview__copy">
+            <div class="overview__heading">
+              <span class="overview__number" aria-hidden="true">01</span>
+              <h2 id="overview-title">Overview</h2>
+            </div>
+            <p>
+              We present PRIMAL3, an ultra-large-scale learning-based framework for multi-agent pathfinding (MAPF) that integrates reinforcement learning, topology-aware communication, LaCAM3-guided training, and PIBT-based action refinement. PRIMAL3 targets failures at topologically critical states, where agents must coordinate decisively around bottlenecks, dead ends, and persistent conflicts. Each agent is represented using features derived from cut vertices, dead-end regions, shortest-path distances, and blocking estimates. Two complementary graphs capture agent interactions: a same-direction following graph propagates multihop context along compatible paths, while a different-direction conflict graph differentiates agents competing for shared space through masked attention and relative features. During training, we propose to let policy entropy identify uncertain agents, for which LaCAM3 provides confidence-triggered action interventions and label-smoothed imitation targets. During execution, a priority-aware PIBT module refines the proposed joint actions using persistent, learned, and distance-aware priorities together with policy-aware fallback preferences while maintaining collision-free execution. The resulting framework combines learned exploration with structured expert guidance without requiring LaCAM3 at inference. Experiments demonstrate that PRIMAL3 substantially outperforms state-of-the-art learning-based baselines and scales to ultra-large instances with up to city-level 100,000 agents. Real-world experiments further demonstrate the feasibility of deploying PRIMAL3 on physical robotic systems and ablation studies validate the individual contributions the components we proposed.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="results" aria-labelledby="results-title">
+        <div class="results__inner">
+          <header class="results__header">
+            <span class="results__number" aria-hidden="true">02</span>
+            <h2 id="results-title">Experimental Results</h2>
+          </header>
+
+          <div class="results__list">
+            <figure class="result-card">
+              <div class="result-card__media">
+                <img
+                  src="results/compare.png"
+                  alt="Comparison of PRIMAL3 with search-based and learning-based MAPF solvers across random and maze maps"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <figcaption class="result-card__caption">
+                <span class="result-card__label">Benchmark comparison</span>
+                <p>
+                  PRIMAL3 achieves success rates comparable to those of state-of-the-art search-based solvers, including LNS2 and LaCAM3, substantially narrowing the long-standing performance gap between learning-based and classical MAPF methods.
+                </p>
+              </figcaption>
+            </figure>
+
+            <figure class="result-card result-card--reverse">
+              <div class="result-card__media">
+                <img
+                  src="results/compare2.png"
+                  alt="Success-rate comparison between PRIMAL3 and HMAGAT as the number of agents increases"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <figcaption class="result-card__caption">
+                <span class="result-card__label">Large-scale performance</span>
+                <p>
+                  In large-scale experiments, PRIMAL3 maintains a high success rate as the number of agents increases, while HMAGAT degrades rapidly at larger scales.
+                </p>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section id="simulations" class="simulations" aria-labelledby="simulations-title">
+        <div class="simulations__inner">
+          <header class="simulations__header">
+            <div class="simulations__title">
+              <span class="simulations__number" aria-hidden="true">03</span>
+              <h2 id="simulations-title">Simulation at Scale</h2>
+            </div>
+            <p>From 1,000 to 100,000 agents</p>
+          </header>
+
+          <div class="simulations__grid">
+            <article class="simulation-card" data-video-zoom>
+              <div class="simulation-card__viewport">
+                <video autoplay muted loop playsinline preload="metadata" aria-label="Simulation with 1,000 agents">
+                  <source src="sim/1000_zoom.mp4" type="video/mp4" />
+                </video>
+                <canvas class="simulation-card__lens" aria-hidden="true"></canvas>
+                <div class="simulation-card__count">
+                  <strong>1,000</strong>
+                  <span>agents</span>
+                </div>
+                <div class="simulation-card__zoom-hint" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <circle cx="10.7" cy="10.7" r="6.7"></circle>
+                    <path d="m16 16 4.2 4.2"></path>
+                    <path d="M10.7 7.6v6.2M7.6 10.7h6.2"></path>
+                  </svg>
+                  <span>Move to explore</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="simulation-card" data-video-zoom>
+              <div class="simulation-card__viewport">
+                <video autoplay muted loop playsinline preload="metadata" aria-label="Simulation with 5,000 agents">
+                  <source src="sim/5000_zoom.mp4" type="video/mp4" />
+                </video>
+                <canvas class="simulation-card__lens" aria-hidden="true"></canvas>
+                <div class="simulation-card__count">
+                  <strong>5,000</strong>
+                  <span>agents</span>
+                </div>
+                <div class="simulation-card__zoom-hint" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <circle cx="10.7" cy="10.7" r="6.7"></circle>
+                    <path d="m16 16 4.2 4.2"></path>
+                    <path d="M10.7 7.6v6.2M7.6 10.7h6.2"></path>
+                  </svg>
+                  <span>Move to explore</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="simulation-card" data-video-zoom>
+              <div class="simulation-card__viewport">
+                <video autoplay muted loop playsinline preload="metadata" aria-label="Simulation with 10,000 agents">
+                  <source src="sim/10000_zoom.mp4" type="video/mp4" />
+                </video>
+                <canvas class="simulation-card__lens" aria-hidden="true"></canvas>
+                <div class="simulation-card__count">
+                  <strong>10,000</strong>
+                  <span>agents</span>
+                </div>
+                <div class="simulation-card__zoom-hint" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <circle cx="10.7" cy="10.7" r="6.7"></circle>
+                    <path d="m16 16 4.2 4.2"></path>
+                    <path d="M10.7 7.6v6.2M7.6 10.7h6.2"></path>
+                  </svg>
+                  <span>Move to explore</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="simulation-card" data-video-zoom>
+              <div class="simulation-card__viewport">
+                <video autoplay muted loop playsinline preload="metadata" aria-label="Simulation with 50,000 agents">
+                  <source src="sim/50k_zoom.mp4" type="video/mp4" />
+                </video>
+                <canvas class="simulation-card__lens" aria-hidden="true"></canvas>
+                <div class="simulation-card__count">
+                  <strong>50,000</strong>
+                  <span>agents</span>
+                </div>
+                <div class="simulation-card__zoom-hint" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <circle cx="10.7" cy="10.7" r="6.7"></circle>
+                    <path d="m16 16 4.2 4.2"></path>
+                    <path d="M10.7 7.6v6.2M7.6 10.7h6.2"></path>
+                  </svg>
+                  <span>Move to explore</span>
+                </div>
+              </div>
+            </article>
+
+            <article class="simulation-card simulation-card--featured" data-video-zoom>
+              <div class="simulation-card__viewport">
+                <video autoplay muted loop playsinline preload="metadata" aria-label="Simulation with 100,000 agents">
+                  <source src="sim/100k_zoom.mp4" type="video/mp4" />
+                </video>
+                <canvas class="simulation-card__lens" aria-hidden="true"></canvas>
+                <div class="simulation-card__count">
+                  <strong>100,000</strong>
+                  <span>agents</span>
+                </div>
+                <div class="simulation-card__featured-label">City-scale demonstration</div>
+                <div class="simulation-card__zoom-hint" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" role="img">
+                    <circle cx="10.7" cy="10.7" r="6.7"></circle>
+                    <path d="m16 16 4.2 4.2"></path>
+                    <path d="M10.7 7.6v6.2M7.6 10.7h6.2"></path>
+                  </svg>
+                  <span>Move to explore</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="real-world" class="real-world" aria-labelledby="real-world-title">
+        <div class="real-world__inner">
+          <header class="real-world__header">
+            <div class="real-world__title">
+              <span class="real-world__number" aria-hidden="true">04</span>
+              <h2 id="real-world-title">Real-World Validation</h2>
+            </div>
+            <p>Physical &amp; mixed reality</p>
+          </header>
+
+          <div class="real-world__experiments">
+            <article class="real-experiment">
+              <div class="real-experiment__stage">
+                <div class="real-experiment__video">
+                  <video autoplay muted loop playsinline preload="metadata" aria-label="Eight-robot physical MAPF experiment">
+                    <source src="real/real_8.mp4" type="video/mp4" />
+                  </video>
+                  <span class="real-experiment__video-label">Physical deployment</span>
+                </div>
+
+                <div class="real-experiment__copy">
+                  <span class="real-experiment__index">Experiment 01</span>
+                  <div class="real-experiment__agent-count">
+                    <strong>8</strong>
+                    <span>agents</span>
+                  </div>
+                  <p>8 physical robots performing MAPF on a <span class="math">10 × 10</span> random map.</p>
+                </div>
+              </div>
+
+              <figure class="real-experiment__timeline">
+                <div class="real-experiment__timeline-scroll">
+                  <img
+                    src="real/real_8.png"
+                    alt="Four stages of the eight-robot physical MAPF experiment"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption>Experiment timeline</figcaption>
+              </figure>
+            </article>
+
+            <article class="real-experiment real-experiment--reverse">
+              <div class="real-experiment__stage">
+                <div class="real-experiment__video">
+                  <video autoplay muted loop playsinline preload="metadata" aria-label="Mixed-reality MAPF experiment with 100 agents">
+                    <source src="real/real_100.mp4" type="video/mp4" />
+                  </video>
+                  <span class="real-experiment__video-label">Mixed reality</span>
+                </div>
+
+                <div class="real-experiment__copy">
+                  <span class="real-experiment__index">Experiment 02</span>
+                  <div class="real-experiment__agent-count">
+                    <strong>100</strong>
+                    <span>agents</span>
+                  </div>
+                  <p>Mixed-reality experiment with 8 physical robots and 92 virtual agents on a <span class="math">32 × 32</span> random map.</p>
+                </div>
+              </div>
+
+              <figure class="real-experiment__timeline">
+                <div class="real-experiment__timeline-scroll">
+                  <img
+                    src="real/real_100.png"
+                    alt="Four stages of the 100-agent mixed-reality MAPF experiment"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <figcaption>Experiment timeline</figcaption>
+              </figure>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="resources" class="resources" aria-labelledby="resources-title">
+        <div class="resources__inner">
+          <header class="resources__header">
+            <div class="resources__title">
+              <span class="resources__number" aria-hidden="true">05</span>
+              <h2 id="resources-title">Resources</h2>
+            </div>
+            <p>Code, paper, team, and citation materials are collected here.</p>
+          </header>
+
+          <div class="resources__grid">
+            <a
+              class="resource-link resource-link--active"
+              href="https://github.com/marmotlab/PRIMAL3"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-resource="github"
+            >
+              <span class="resource-link__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2.4a9.8 9.8 0 0 0-3.1 19.1c.5.1.7-.2.7-.5v-1.9c-2.9.6-3.5-1.2-3.5-1.2-.5-1.2-1.2-1.5-1.2-1.5-.9-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1.9 1.7 2.5 1.2 3 .9.1-.7.4-1.2.7-1.5-2.3-.3-4.8-1.2-4.8-4.9 0-1.1.4-2 1.1-2.7-.1-.3-.5-1.3.1-2.7 0 0 .9-.3 2.8 1.1a9.7 9.7 0 0 1 5.1 0c1.9-1.3 2.8-1.1 2.8-1.1.6 1.4.2 2.4.1 2.7.7.7 1.1 1.6 1.1 2.7 0 3.8-2.4 4.6-4.7 4.9.4.3.7 1 .7 1.9V21c0 .3.2.6.7.5A9.8 9.8 0 0 0 12 2.4Z"></path>
+                </svg>
+              </span>
+              <span class="resource-link__content">
+                <span class="resource-link__eyebrow">Code</span>
+                <strong>GitHub Repository</strong>
+                <span class="resource-link__description">Implementation and pretrained models</span>
+              </span>
+              <span class="resource-link__status resource-link__status--active">View repository <span aria-hidden="true">→</span></span>
+            </a>
+
+            <a
+              class="resource-link"
+              href="#resources"
+              aria-disabled="true"
+              tabindex="-1"
+              data-resource="arxiv"
+            >
+              <span class="resource-link__icon resource-link__icon--paper" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M6.5 2.8h7.1l4 4v14.4H6.5V2.8Z"></path>
+                  <path d="M13.5 2.8v4.4h4.1M9.2 11h5.6M9.2 14.2h5.6M9.2 17.4h3.8"></path>
+                </svg>
+              </span>
+              <span class="resource-link__content">
+                <span class="resource-link__eyebrow">Paper</span>
+                <strong>arXiv Manuscript</strong>
+                <span class="resource-link__description">Preprint and supplementary material</span>
+              </span>
+              <span class="resource-link__status">Coming soon</span>
+            </a>
+
+            <a
+              class="resource-link resource-link--active"
+              href="team.html"
+              data-resource="team"
+            >
+              <span class="resource-link__icon resource-link__icon--team" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="8" cy="8.2" r="3.1"></circle>
+                  <circle cx="17.2" cy="9.2" r="2.5"></circle>
+                  <path d="M2.8 19.3c.4-3.4 2.1-5.2 5.2-5.2s4.9 1.8 5.2 5.2M14.1 14.5c.8-.6 1.8-.9 3.1-.9 2.5 0 3.9 1.5 4.1 4.2"></path>
+                </svg>
+              </span>
+              <span class="resource-link__content">
+                <span class="resource-link__eyebrow">People</span>
+                <strong>Meet the Team</strong>
+                <span class="resource-link__description">Authors and affiliations</span>
+              </span>
+              <span class="resource-link__status resource-link__status--active">View team <span aria-hidden="true">→</span></span>
+            </a>
+          </div>
+
+          <div class="bibtex" aria-labelledby="bibtex-title">
+            <div class="bibtex__heading">
+              <span class="bibtex__eyebrow">Citation</span>
+              <h3 id="bibtex-title">BibTeX</h3>
+              <p>Select and copy the citation below.</p>
+            </div>
+            <pre><code>@article{he2026primal3,
+  title={PRIMAL3: Pathfinding via Reinforcement and Imitation \\ Multi-Agent Learning - Leveraging LaCAM3},
+  author={He, Chengyang and Duhan, Tanishq and Camps, Gadiel Sznaier and Wang, Fangyuan and Cao, Yuhong and Sun, Jiankai and Sun, Ge and Schwager, Mac and Sartoretti, Guillaume},
+  journal={arXiv preprint arXiv:XXXX.XXXXX},
+  year={2026}
+}</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="contact" aria-labelledby="contact-title">
+        <div class="contact__inner">
+          <div class="contact__heading">
+            <span class="contact__number" aria-hidden="true">06</span>
+            <h2 id="contact-title">Contact</h2>
+          </div>
+          <p>
+            For questions about PRIMAL3, please feel free to contact Chengyang He at <a href="mailto:chengyanghe@u.nus.edu">chengyanghe@u.nus.edu</a> or <a href="mailto:hecy@stanford.edu">hecy@stanford.edu</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

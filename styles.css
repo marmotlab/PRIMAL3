@@ -490,6 +490,10 @@ sup {
   grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1.48fr);
 }
 
+.result-card--wide {
+  grid-template-columns: 1fr;
+}
+
 .result-card__media {
   display: grid;
   min-width: 0;
@@ -523,6 +527,16 @@ sup {
   border-left: 0;
 }
 
+.result-card--wide .result-card__caption {
+  display: grid;
+  padding: clamp(28px, 3.5vw, 44px);
+  grid-template-columns: 42px minmax(165px, 0.38fr) minmax(0, 1fr);
+  gap: clamp(18px, 2.5vw, 32px);
+  align-items: center;
+  border-top: 1px solid #dbe2e6;
+  border-left: 0;
+}
+
 .result-card__caption::before {
   width: 42px;
   height: 3px;
@@ -533,6 +547,15 @@ sup {
 
 .result-card--reverse .result-card__caption::before {
   background: #f46b63;
+}
+
+.result-card--wide .result-card__caption::before {
+  margin-bottom: 0;
+  background: #f46b63;
+}
+
+.result-card--wide .result-card__label {
+  margin-bottom: 0;
 }
 
 .result-card__label {
@@ -1409,6 +1432,14 @@ sup {
     border-left: 0;
   }
 
+  .result-card--wide .result-card__caption {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .result-card--wide .result-card__caption p {
+    grid-column: 1 / -1;
+  }
+
   .real-experiment__stage,
   .real-experiment--reverse .real-experiment__stage {
     grid-template-columns: 1fr;
@@ -1518,6 +1549,18 @@ sup {
 
   .result-card__caption {
     padding: 30px 26px 34px;
+  }
+
+  .result-card--wide .result-card__media {
+    overflow-x: auto;
+    place-items: start;
+    scrollbar-color: #718894 #dce3e6;
+    scrollbar-width: thin;
+  }
+
+  .result-card--wide .result-card__media img {
+    width: 760px;
+    max-width: none;
   }
 
   .simulations__inner {

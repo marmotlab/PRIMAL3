@@ -179,4 +179,5 @@ dependencies:
       - torchvision==0.23.0+cu128
       - triton==3.4.0
       - wandb==0.18.7
+      - huggingface_hub
 prefix: /home/patrick/anaconda3/envs/MAPF

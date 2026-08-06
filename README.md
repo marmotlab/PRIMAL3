@@ -36,7 +36,7 @@ PRIMAL3 is a learning-based framework for multi-agent pathfinding (MAPF) that co
 | **PIBT action refinement** | Applies persistent, learned, and distance-aware priorities to refine joint actions and prevent collisions. |
 | **Cross-scale evaluation** | Includes input clipping and fast path extraction for evaluation beyond the training scale. |
 
-This repository bundles the trained checkpoint, reproducible `32 × 32` benchmark instances for **50, 100, 150, 200, 250, and 300 agents**, and a separate `72 × 72` random-map set for **1,000-agent** evaluation.
+This repository provides reproducible `32 × 32` benchmark instances for **50, 100, 150, 200, 250, and 300 agents**, a separate `72 × 72` random-map set for **1,000-agent** evaluation, and a utility for downloading the pretrained checkpoint from Hugging Face.
 
 ## Quick start
 
@@ -52,7 +52,26 @@ conda activate MAPF
 > [!NOTE]
 > Run all commands from the repository root. Evaluation paths are relative to this directory.
 
-### 2. Run the default evaluation
+### 2. Download the pretrained checkpoint
+
+Download the model before running any evaluation:
+
+```bash
+python checkpoint_utils.py
+```
+
+The script downloads [`hechengyang/PRIMAL3`](https://huggingface.co/hechengyang/PRIMAL3) from Hugging Face and places `net_checkpoint.pkl` at the path expected by all evaluation runners:
+
+```text
+models/primal3/primal3_v22_pibt_inherit_v217-06-261404/26427392/net_checkpoint.pkl
+```
+
+The checkpoint is approximately 140 MiB. If it already exists, the script reuses the local file instead of downloading it again.
+
+> [!IMPORTANT]
+> Run `checkpoint_utils.py` after installing the environment and before running either the standard evaluator or the 1,000-agent evaluator.
+
+### 3. Run the default evaluation
 
 ```bash
 python run_the_instances.py
@@ -61,6 +80,8 @@ python run_the_instances.py
 The default configuration evaluates the pretrained model with 50 agents on 200 saved instances. Inference runs on CPU and test cases are parallelized with Ray.
 
 ## Pretrained evaluation
+
+All evaluation commands below expect the checkpoint downloaded by `checkpoint_utils.py` to be present at the default model path.
 
 ### Choose the number of agents
 
@@ -189,7 +210,7 @@ The central configuration lives in [`alg_parameters.py`](alg_parameters.py).
 | `EnvParameters.FAST_PATHS` | `True` | Uses cached goal-BFS maps for large-scale path extraction. |
 | `EnvParameters.PIBT_SVO_WEIGHT` | `1` | Weight of the learned social priority in PIBT shielding. |
 
-The pretrained checkpoint used by the evaluator is located at:
+The pretrained checkpoint downloaded by [`checkpoint_utils.py`](checkpoint_utils.py) is stored at:
 
 ```text
 models/primal3/primal3_v22_pibt_inherit_v217-06-261404/26427392/net_checkpoint.pkl
@@ -200,6 +221,7 @@ models/primal3/primal3_v22_pibt_inherit_v217-06-261404/26427392/net_checkpoint.p
 ```text
 .
 ├── alg_parameters.py       # Environment, network, and optimization settings
+├── checkpoint_utils.py     # Hugging Face checkpoint downloader
 ├── run_the_instances.py    # Parallel pretrained-model evaluation
 ├── sequence_test.py        # Hand-authored scenario runner and SVG export
 ├── mapf_gym.py             # MAPF environment and execution logic
@@ -211,12 +233,26 @@ models/primal3/primal3_v22_pibt_inherit_v217-06-261404/26427392/net_checkpoint.p
 ├── expert_guidance.py      # LaCAM3 expert integration
 ├── lacam3/                 # Bundled LaCAM3 Python bindings and source
 ├── pibt/                   # PIBT implementation
-├── models/                 # Pretrained PRIMAL3 checkpoint
+├── models/                 # Downloaded PRIMAL3 checkpoint destination
 └── 32_size_maps/           # Saved benchmark instances
     └── random_1000/        # 72 × 72 / 1,000-agent runner, cases, and SVGs
 ```
 
 ## Troubleshooting
+
+<details>
+<summary><strong>The pretrained checkpoint is missing</strong></summary>
+
+Activate the project environment and run `python checkpoint_utils.py` from the repository root. The downloader creates the expected model directory automatically.
+
+</details>
+
+<details>
+<summary><strong><code>huggingface_hub</code> is not installed</strong></summary>
+
+Activate the `MAPF` environment. If it was created before the downloader dependency was added, update it with `conda env update -f MAPF.yml` and run the download command again.
+
+</details>
 
 <details>
 <summary><strong>Ray tries to start more workers than the machine can support</strong></summary>

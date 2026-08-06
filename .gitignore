@@ -1,0 +1,16 @@
+.vscode
+.idea/
+__pycache__/
+!spec/*.pyc
+gifs/
+wandb/
+
+
+
+/models/primal3/primal3_v22_pibt_inherit_v217-06-261404/26427392/net_checkpoint.pkl
+__pycache__/
+*.pyc
+*.log
+progress*.csv
+partial_results*.csv
+.DS_Store

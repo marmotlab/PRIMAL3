@@ -1312,22 +1312,6 @@ sup {
   line-height: 1;
 }
 
-.bibtex__warning {
-  display: inline-flex;
-  width: fit-content;
-  margin-bottom: 13px;
-  padding: 7px 9px;
-  border: 1px solid rgba(190, 112, 20, 0.28);
-  border-radius: 6px;
-  background: rgba(255, 178, 63, 0.14);
-  color: #a65f0e;
-  font-size: 0.61rem;
-  font-weight: 850;
-  letter-spacing: 0.11em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
 .bibtex__heading p {
   margin: 0;
   color: #70818b;

@@ -38,12 +38,12 @@ def weights_init(m):
             m.bias.data.fill_(0)
 
 
-class SCRIMPNet(nn.Module):
+class PRIMAL3Net(nn.Module):
     """network with transformer-based communication mechanism"""
 
     def __init__(self):
         """initialization"""
-        super(SCRIMPNet, self).__init__()
+        super(PRIMAL3Net, self).__init__()
         self.L = 16
         self.cT = NetParameters.NET_SIZE
         self.mlp_dim = 512

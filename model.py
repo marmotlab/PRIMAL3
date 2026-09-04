@@ -6,7 +6,7 @@ from torch.cuda.amp.autocast_mode import autocast
 from torch.cuda.amp.grad_scaler import GradScaler
 # from selfish_model import SelfishModel
 from alg_parameters import *
-from net import SCRIMPNet
+from net import PRIMAL3Net
 import torch.nn as nn
 
 from util import Loss
@@ -18,7 +18,7 @@ class Model(object):
         """initialization"""
         self.ID = env_id
         self.device = device
-        self.network = SCRIMPNet().to(device)  # neural network
+        self.network = PRIMAL3Net().to(device)  # neural network
         # use MI Loss or not
         # self.selfish_model = SelfishModel(self.device)
         if global_model:
